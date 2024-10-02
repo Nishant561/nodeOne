@@ -93,6 +93,41 @@ app.post('/signup', async(request, response ,next)=>{
 
 })
 
+app.patch('/update/:email' , async(request, response)=>{
+    try {
+        const {email} = request.params
+        const allowedFieldToUpdate = [
+            "age",
+            "password"
+        ]
+
+        const data= Object.assign(request.body)
+        
+        const isAllowed = Object.keys(data).every( key => (
+            allowedFieldToUpdate.includes(key)
+        ))
+        
+        if(!isAllowed){
+            throw new Error ("field is protected Something went wrong!")
+        }
+
+    const user = await User.findOneAndUpdate({email} ,request.body ,{
+        returnDocument:'before',
+        
+    })
+    console.log(user)
+    return response.status(201).json({
+        status:'success',
+        message:"user update successful."
+    })
+    } catch (error) {
+        return response.status(404).json({
+            status:'fail',
+            message:"User cannot be updated." + error.message
+        })
+    }
+})
+
 
 
 

@@ -17,8 +17,16 @@ const userSchema = new mongoose.Schema({
         required:[true , "Password is required"],
         minLength:4,
         maxLength:20
+    },
+    skills:{
+        type:[String],
+        default:["javascript" , "c" ,"c++"]
+    },
+    age:{
+        type:Number,
+        default:18
     }
-}{
+},{
     timestamps:true
 })
 
