@@ -1,6 +1,12 @@
 const express = require('express')
 const {databaseConnection} = require("./config/database")
+const {User} = require("./config/schema/userModel")
 let app = express()
+
+//this is the middleware due to which the request body can be read.
+app.use(express.json())
+
+
 
 //order matters in the route handling concept
 
@@ -59,6 +65,37 @@ let app = express()
 
 
 // database should be connected before the server started (best practice)
+
+
+//adding the user in the database
+
+app.post('/signup', async(request, response ,next)=>{
+    
+        
+ try {
+    const user = await User.create(request.body)
+     await user.save()
+      return response.status(200).json({
+          status:'Success',
+          message:"User created successfully."
+      })
+ } catch (error) {
+        return response.status(404).json({
+            status:'fail',
+            message:"something went wrong" + error.message
+        })
+ }
+
+        
+   
+    
+
+
+})
+
+
+
+
 
 databaseConnection()
 .then(()=>{
