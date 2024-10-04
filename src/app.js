@@ -4,6 +4,8 @@ const { User } = require("./config/schema/userModel");
 const cookieParser = require("cookie-parser")
 const bcrypt = require('bcrypt')
 const authUser = require("./middleware/authUser")
+const {authRouter} = require("./routes/authRouter")
+const {profileRouter} = require("./routes/profileRoute")
 let app = express();
 
 //this is the middleware due to which the request body can be read.
@@ -12,6 +14,13 @@ app.use(express.json());
 
 // this is the cookie parser like express.json to read the request body it is used to read the cookie\
 app.use(cookieParser())
+
+
+
+// using the express router
+app.use("/" , authRouter )
+app.use("/", profileRouter)
+
 
 //order matters in the route handling concept
 
@@ -68,106 +77,16 @@ app.use(cookieParser())
 
 //NOTE:: You can add the validation in the database schema using the validators or by using the joi
 
-app.post("/signup", async (request, response, next) => {
-  try {
-    const {firstName , email , password , skills , age} = request.body
-    const passwordHash = await bcrypt.hash(password , 10)
-    console.log(passwordHash)
-    const user = await User.create({
-      firstName,
-      email,
-      skills,
-      age,
-      password: passwordHash
-
-    });
-    await user.save();
-    return response.status(200).json({
-      status: "Success",
-      message: "User created successfully.",
-    });
-  } catch (error) {
-    return response.status(404).json({
-      status: "fail",
-      message: "something went wrong" + error.message,
-    });
-  }
-});
-
-app.patch("/update/:email", async (request, response) => {
-  try {
-    const { email } = request.params;
-    const allowedFieldToUpdate = ["age", "password"];
-
-    const data = Object.assign(request.body);
-
-    const isAllowed = Object.keys(data).every((key) =>
-      allowedFieldToUpdate.includes(key)
-    );
-
-    if (!isAllowed) {
-      throw new Error("field is protected Something went wrong!");
-    }
-
-    const user = await User.findOneAndUpdate({ email }, request.body, {
-      returnDocument: "before",
-    });
-    console.log(user);
-    return response.status(201).json({
-      status: "success",
-      message: "user update successful.",
-    });
-  } catch (error) {
-    return response.status(404).json({
-      status: "fail",
-      message: "User cannot be updated." + error.message,
-    });
-  }
-});
 
 
 
-app.post("/login" ,authUser.login ,async (request , response)=>{
-  try {
-
-      const {firstName} = request.user
-
-      return response.status(200).json({
-        status:"success",
-        name:firstName,
-        message:"Logged In successfully"
-      })
-
-  } catch (error) {
-      return response.status(400).json({
-        status:"fail",
-        message:"something went wrong." + error.message
-      })
-  }
-})
-
-
-app.get("/profile" , authUser.protect , async (request , response)=>{
-    try {
-      const user = Object.assign(request.user)
-
-      return response.status(200).json({
-        status:"success",
-        data:{
-          user
-        }
-      })
 
 
 
-    } catch (error) {
-      return response.status(404).json({
-        status:"fail",
-        message:"Error:: " + error.message
-      })
-    }
-    
-})
+
+
+
+
 
 databaseConnection()
   .then(() => {
