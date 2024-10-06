@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt')
 const authUser = require("./middleware/authUser")
 const {authRouter} = require("./routes/authRouter")
 const {profileRouter} = require("./routes/profileRoute")
+const connectionRouter = require("./routes/connection")
+const userConnectionRouter = require("./routes/userConnection")
 let app = express();
 
 //this is the middleware due to which the request body can be read.
@@ -20,6 +22,8 @@ app.use(cookieParser())
 // using the express router
 app.use("/" , authRouter )
 app.use("/", profileRouter)
+app.use("/", connectionRouter)
+app.use("/", userConnectionRouter)
 
 
 //order matters in the route handling concept
